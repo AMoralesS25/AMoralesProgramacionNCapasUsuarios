@@ -1,0 +1,427 @@
+﻿@model ML.Usuario
+@{
+    ViewBag.Title = "Form";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/Styles/StyleForm.css" />
+
+@using (Html.BeginForm("Form", "Usuario", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+    <h2>Usuario</h2>
+    <hr />
+    <div class="container mt-4">
+        @Html.HiddenFor(model => model.IdUsuario)
+        @Html.HiddenFor(model => model.Imagen)
+        <div class="row mt-5">
+            <div class="col">
+                <div class="form-group mt-2">
+                    <input type="file" accept=".png" name="inptFileImagen" onchange="validarImagen(),
+                    visualizarImagen(this)" id="inptFileImagen" />
+                    @* <img id="img" src="https://cdn-icons-png.flaticon.com/512/6522/6522581.png" width="200" , height="200" />*@
+                    @if (Model.Imagen == null)
+                    {
+                        <img id="img" src="https://cdn-icons-png.flaticon.com/512/6522/6522581.png" width="90" , height="90" />
+                    }
+                    else
+                    {
+                        <img src="data:image/*;base64, @Convert.ToBase64String(Model.Imagen)" width="90" , height="90" />
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.UserName, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.UserName, new { @class = "form-control", @required = "required", @onkeypress = "SoloLetras(event)" })
+                    <span class="error"></span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Nombre, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Nombre, new { @class = "form-control", @required = "required", @onkeypress = "SoloLetras(event)" })
+                    <span class="error"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.ApellidoPaterno, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.ApellidoPaterno, new { @class = "form-control", @required = "required", @onkeypress = "SoloLetras(event)" })
+                    <span class="error"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.ApellidoMaterno, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.ApellidoMaterno, new { @class = "form-control", @required = "required", @onkeypress = "SoloLetras(event)" })
+                    <span class="error"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.CURP, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.CURP, new { @class = "form-control", @required = "required", @onblur = "validarCurp(this)" })
+                    <span class="error" display: none;"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Email, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", @required = "required", @onblur = "validarEmail(this)" })
+                    <span class="error" display: none;"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Password, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Password, new { @class = "form-control", @required = "required" })
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group mt-2">
+                    <label>Confirmar password</label>
+                    <input type="text" id="inptConfirmarNombre" onblur="ConfirmarContraseña()"/>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.FechaNacimiento, new { @class = "form-label" })
+                    @*@Html.TextBoxFor(model => model.FechaNacimiento, new { @class = "form-control", @placeholder = "dd/mm/aaaa", @required = "required" })*@
+                    @Html.TextBoxFor(model => model.FechaNacimiento, new { @class = "form-control", @required = "required", @type = "text", @id = "datepicker" })
+                    @*<input type="text" id="datepicker" name="FechaNacimiento" class = "form-control">*@
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Sexo, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Sexo, new { @class = "form-control", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Telefono, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Telefono, new { @class = "form-control", @required = "required", @onkeypress = "SoloNumeros(event)" })
+                    <span class="error"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Celular, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Celular, new { @class = "form-control", @required = "required", @onkeypress = "SoloNumeros(event)" })
+                    <span class="error"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.DropDownListFor(model => model.Rol.IdRol, new SelectList(Model.Rol.Roles, "IdRol", "Nombre"),
+                   "Selecciona un Rol", new { @class = "form-select", @required = "required" })
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Estatus, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Estatus, new { @class = "form-control", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <br /><br /><br />
+        <h2>Dirección</h2>
+        <hr />
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Direccion.Calle, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Direccion.Calle, new { @class = "form-control", @required = "required" })
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Direccion.NumeroExterior, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Direccion.NumeroExterior, new { @class = "form-control", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Direccion.NumeroInterior, new { @class = "form-label" })
+                    @Html.TextBoxFor(model => model.Direccion.NumeroInterior, new { @class = "form-control", @required = "required" })
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group mt-4">
+                    @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado,
+                   new SelectList(Model.Direccion.Colonia.Municipio.Estado.Estados, "IdEstado", "Nombre"),
+                   "Selecciona un estado", new
+                        {
+                            @class = "form-select",
+                            @required = "required",
+                            @onchange = "MunicipioGetByIdEstado()",
+                            @id = "ddlEstado"
+                        })
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @if (Model.Direccion.Colonia.Municipio.Municipios != null || Model.Direccion.Colonia.Municipio.IdMunicipio > 0)
+                    {
+                        @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.IdMunicipio,
+                        new SelectList(Model.Direccion.Colonia.Municipio.Municipios, "IdMunicipio", "Nombre"),
+                        "Selecciona un municipio", new
+                        {
+                            @class = "form-select",
+                            @required = "required",
+                            @id = "ddlMunicipio",
+                            @onchange = "ColoniaGetByIdMunicipio()"
+                        })
+                    }
+                    else
+                    {
+                        @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.IdMunicipio,
+                       new SelectList(String.Empty),
+                       "Selecciona un municipio", new
+                            {
+                                @class = "form-select",
+                                @required = "required",
+                                @onchange = "ColoniaGetByIdMunicipio()",
+                                @id = "ddlMunicipio"
+                            })
+                    }
+
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group mt-2">
+                    @if (Model.Direccion.Colonia.Colonias != null || Model.Direccion.Colonia.IdColonia > 0)
+                    {
+                        @Html.DropDownListFor(model => model.Direccion.Colonia.IdColonia,
+                        new SelectList(Model.Direccion.Colonia.Colonias, "IdColonia", "Nombre"),
+                        "Selecciona una colonia", new
+                            {
+                                @class = "form-select",
+                                @required = "required",
+                                @id = "ddlColonia"
+                            })
+                    }
+                    else
+                    {
+                        @Html.DropDownListFor(model => model.Direccion.Colonia.IdColonia,
+                        new SelectList(String.Empty),
+                        "Selecciona una colonia", new
+                        {
+                            @class = "form-select",
+                            @required = "required",
+                            @id = "ddlColonia"
+                         })
+                    }
+
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+
+        </div>
+    </div>
+    <div class="form-group mt-4">
+        <button type="submit" class="btn btn-success">Guardar</button>
+    </div>
+
+}
+
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="~/Scripts/jquery-3.7.0.js"></script>
+<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+<script>
+
+    //validar correo electronico
+    function validarEmail(input) {
+        var email = input.value;
+
+        // Expcxdfresión regular
+        var regexEmail = /^\w+([.-_+]?\w+)*@@\w+([.-]?\w+)*(\.\w{2,10})+$/;
+
+        var errorMessage = input.parentNode.querySelector('.error');
+
+        // Limpiar mensaje de error
+        errorMessage.textContent = '';
+
+        // Validar si el correo esta bienn
+        if (regexEmail.test(email)) {
+            // cambiar el borde a verde
+            input.style.borderColor = "green";
+            errorMessage.style.display = "none";
+        } else {
+            // Si no es válido, cambiar el borde a rojo y mostrar el span
+            input.style.borderColor = "red";
+            errorMessage.style.display = "inline";
+            errorMessage.textContent = 'El correo electrónico es incorrecto.';
+        }
+    }
+
+
+    //validar curp
+    function validarCurp(input) {
+        var curp = input.value.toUpperCase();
+
+        // Expresión regular para validar CURP
+        var regexCurp = /^([A-Z][AEIOUX][A-Z]{2}\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])[HM](?:AS|B[CS]|C[CLMSH]|D[FG]|G[TR]|HG|JC|M[CNS]|N[ETL]|OC|PL|Q[TR]|S[PLR]|T[CSL]|VZ|YN|ZS)[B-DF-HJ-NP-TV-Z]{3}[A-Z\d])(\d)$/;
+
+        // Buscar el span de error dentro del contenedor del input
+        var errorMessage = input.parentNode.querySelector('.error');
+
+        // Limpiar mensaje de error previo
+        errorMessage.textContent = '';
+
+        // Validar si el CURP cumple con el formato
+        if (regexCurp.test(curp)) {
+            // Si es válido, cambiar el borde a verde
+            input.style.borderColor = "green";
+            errorMessage.style.display = "none"; // Ocultar mensaje de error
+        } else {
+            // Si no es válido, cambiar el borde a rojo
+            input.style.borderColor = "red";
+            errorMessage.style.display = "inline"; // Mostrar mensaje de error
+            errorMessage.textContent = 'El CURP es erróneo.'; // Mostrar mensaje de error
+        }
+    }
+
+    //VALIDACION PARA NOMBRE, APELLIDOS
+    function SoloLetras(evento) {
+        var entrada = String.fromCharCode(evento.which)
+        var inputField = evento.target;
+        var ErrorMessage = inputField.parentNode.querySelector('.error')
+        ErrorMessage.textContent = '';
+        if(!(/[a-z A-Z]/.test(entrada))){
+            evento.preventDefault();
+            inputField.style.borderColor = 'red';
+            ErrorMessage.textContent = 'Solo se permiten letras';
+        }
+        else {
+            console.log("si es una letra")
+            inputField.style.borderColor = 'green';
+        }
+    }
+
+    //VALIDACION PARA TELEFONO SOLO NUMEROS 
+    function SoloNumeros(evento) {
+        var entrada = String.fromCharCode(evento.which)
+        var inputField = evento.target;
+        var ErrorMessage = inputField.parentNode.querySelector('.error')
+        ErrorMessage.textContent = '';
+        if (!(/^[0-9]*$/.test(entrada))) {
+            evento.preventDefault();
+            inputField.style.borderColor = 'red';
+            ErrorMessage.textContent = 'Solo se permiten numeros';
+        }
+        else {
+            console.log("si es un numero")
+            inputField.style.borderColor = 'green';
+        }
+    }
+
+
+
+    $("#datepicker").datepicker();
+    dateFormat = "dd-mm-yy";
+    showAnim = "Clip (UI Effect)";
+    function MunicipioGetByIdEstado() {
+        let ddl = $('#ddlEstado').val();
+
+        $.ajax({
+            url: "@Url.Action("GetByIdEstado", "Usuario")?idEstado=" + ddl,
+            type: "GET",
+            datatype: "JSON",
+            //data es solo para modelos
+            success: function (result) {
+                let ddlMunicipio = $('#ddlMunicipio');
+                $(ddlMunicipio).empty();
+                let ddlColonia = $('#ddlColonia');
+                $(ddlColonia).empty();
+                let optionDefault = `<option value>Selecciona un Municipio</option>`
+                ddlMunicipio.append(optionDefault)
+
+                $.each(result.Objects, function (i, valor){
+                    let option = `<option value=${valor.IdMunicipio}>${valor.Nombre}</option>`
+                    //let option = "<option value=" + valor.IdMunicipio + ">" + valor.Nombre + "</option>";
+                    ddlMunicipio.append(option)
+                })
+            },
+            error: function (xhr) {
+                console.log(xhr)
+            }
+        })
+    }
+
+    function ColoniaGetByIdMunicipio() {
+        let ddl = $('#ddlMunicipio').val();
+
+        $.ajax({
+            url: "@Url.Action("GetByIdMunicipio", "Usuario")?idMunicipio=" + ddl,
+            type: "GET",
+            datatype: "JSON",
+            //data es solo para modelos
+            success: function (result) {
+                let ddlColonia = $('#ddlColonia');
+                $(ddlColonia).empty();
+                let optionDefault = `<option value>Selecciona una Colonia</option>`
+                ddlColonia.append(optionDefault)
+                $.each(result.Objects, function (i, valor){
+                    let option = `<option value=${valor.IdColonia}>${valor.Nombre}</option>`
+                    //let option = "<option value=" + valor.IdColonia + ">" + valor.Nombre + "</option>";
+                    ddlColonia.append(option)
+                })
+            },
+            error: function (xhr) {
+                console.log(xhr)
+            }
+        })
+    }
+
+    function validarImagen() {
+        var input = $('#inptFileImagen')[0].files[0].name.split('.').pop().toLowerCase()
+        console.log(input)
+
+        var extensionesValidas = ['png', 'jpg', 'jpeg', 'webp']
+        var banderaImg = false;
+
+        for (var i = 0; i <= extensionesValidas.length; i++) {
+            if (input == extensionesValidas[i]) {
+                banderaImg = true
+            }
+        }
+        if (!banderaImg) {
+            alert(`Las extensiones permitidas son: ${extensionesValidas}`)
+            $('#inptFileImagen').val("");
+        }
+    }
+
+    function visualizarImagen(input) {
+        if (input.files) {
+            var reader = new FileReader();
+            reader.onload = function (elemento) {
+                $('#img').attr('src', elemento.target.result)
+            }
+            reader.readAsDataURL(input.files[0])
+        }
+    }
+
+</script>
+
