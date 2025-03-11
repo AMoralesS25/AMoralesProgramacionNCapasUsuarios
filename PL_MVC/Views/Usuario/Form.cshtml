@@ -34,7 +34,7 @@
             <div class="col">
                 <div class="form-group mt-2">
                     @Html.LabelFor(model => model.UserName, new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.UserName, new { @class = "form-control", @required = "required", @onkeypress = "SoloLetras(event)" })
+                    @Html.TextBoxFor(model => model.UserName, new { @class = "form-control", @required = "required", @onkeypress = "ValidarUserName(this)", @id = "userName" })
                     <span class="error"></span>
                 </div>
             </div>
@@ -82,13 +82,15 @@
             <div class="col">
                 <div class="form-group mt-2">
                     @Html.LabelFor(model => model.Password, new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.Password, new { @class = "form-control", @required = "required" })
+                    @Html.TextBoxFor(model => model.Password, new { @class = "form-control", @id = "inptPassword", @required = "required", @onblur = "validarPassword(this)" })
+                    <span class="error"></span>
                 </div>
             </div>
             <div class="col">
                 <div class="form-group mt-2">
                     <label>Confirmar password</label>
-                    <input type="text" id="inptConfirmarNombre" onblur="ConfirmarContraseña()"/>
+                    <input type="text" id="inptConfirmarPassword" onblur="ConfirmarPassword(this)" class="form-control" />
+                    <span class="error"></span>
                 </div>
             </div>
         </div>
@@ -97,15 +99,26 @@
                 <div class="form-group mt-2">
                     @Html.LabelFor(model => model.FechaNacimiento, new { @class = "form-label" })
                     @*@Html.TextBoxFor(model => model.FechaNacimiento, new { @class = "form-control", @placeholder = "dd/mm/aaaa", @required = "required" })*@
-                    @Html.TextBoxFor(model => model.FechaNacimiento, new { @class = "form-control", @required = "required", @type = "text", @id = "datepicker" })
+                    @Html.TextBoxFor(model => model.FechaNacimiento, new { @class = "form-control", @required = "required", @type = "text", @id = "datepicker", @onblur = "validarFecha(this)" })
                     @*<input type="text" id="datepicker" name="FechaNacimiento" class = "form-control">*@
+                    <span class="error"></span>
                 </div>
             </div>
             <div class="col-6">
-                <div class="form-group mt-2">
+                <divSS class="form-group mt-2 ">
                     @Html.LabelFor(model => model.Sexo, new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.Sexo, new { @class = "form-control", @required = "required" })
-                </div>
+
+                    @*@Html.TextBoxFor(model => model.Sexo, new { @class = "form-control", @required = "required" })*@
+
+                    <div class="form-check">
+                        Hombre
+                        @Html.RadioButtonFor(model => model.Sexo, "H", new { @class = "form-check-input", @required = "required" })
+                    </div>
+                    <div class="form-check">
+                        Mujer
+                        @Html.RadioButtonFor(model => model.Sexo, "M", new { @class = "form-check-input", @required = "required" })
+                    </div>
+                </divSS>
             </div>
         </div>
         <div class="row mt-5">
@@ -128,13 +141,15 @@
             <div class="col-6">
                 <div class="form-group mt-2">
                     @Html.DropDownListFor(model => model.Rol.IdRol, new SelectList(Model.Rol.Roles, "IdRol", "Nombre"),
-                   "Selecciona un Rol", new { @class = "form-select", @required = "required" })
+                   "Selecciona un Rol", new { @class = "form-select", @required = "required", @onchange = "ValidarDDL(this)" })
+                    <span class="error"></span>
                 </div>
             </div>
             <div class="col-6">
                 <div class="form-group mt-2">
                     @Html.LabelFor(model => model.Estatus, new { @class = "form-label" })
                     @Html.TextBoxFor(model => model.Estatus, new { @class = "form-control", @required = "required" })
+                    <span class="error"></span>
                 </div>
             </div>
         </div>
@@ -145,13 +160,15 @@
             <div class="col-6">
                 <div class="form-group mt-2">
                     @Html.LabelFor(model => model.Direccion.Calle, new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.Direccion.Calle, new { @class = "form-control", @required = "required" })
+                    @Html.TextBoxFor(model => model.Direccion.Calle, new { @class = "form-control", @required = "required", @onblur = "ValidarDireccion(this)" })
+                    <span class="error"></span>
                 </div>
             </div>
             <div class="col-6">
                 <div class="form-group mt-2">
                     @Html.LabelFor(model => model.Direccion.NumeroExterior, new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.Direccion.NumeroExterior, new { @class = "form-control", @required = "required" })
+                    @Html.TextBoxFor(model => model.Direccion.NumeroExterior, new { @class = "form-control", @required = "required", @onblur = "ValidarDireccion(this)" })
+                    <span class="error"></span>
                 </div>
             </div>
         </div>
@@ -159,7 +176,8 @@
             <div class="col-6">
                 <div class="form-group mt-2">
                     @Html.LabelFor(model => model.Direccion.NumeroInterior, new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.Direccion.NumeroInterior, new { @class = "form-control", @required = "required" })
+                    @Html.TextBoxFor(model => model.Direccion.NumeroInterior, new { @class = "form-control", @required = "required", @onblur = "ValidarDireccion(this)" })
+                    <span class="error"></span>
                 </div>
             </div>
             <div class="col-6">
@@ -167,12 +185,13 @@
                     @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado,
                    new SelectList(Model.Direccion.Colonia.Municipio.Estado.Estados, "IdEstado", "Nombre"),
                    "Selecciona un estado", new
-                        {
-                            @class = "form-select",
-                            @required = "required",
-                            @onchange = "MunicipioGetByIdEstado()",
-                            @id = "ddlEstado"
-                        })
+                   {
+                       @class = "form-select",
+                       @required = "required",
+                       @onchange = "MunicipioGetByIdEstado(), ValidarDDL(this)",
+                       @id = "ddlEstado"
+                   })
+                    <span class="error"></span>
                 </div>
             </div>
         </div>
@@ -188,7 +207,7 @@
                             @class = "form-select",
                             @required = "required",
                             @id = "ddlMunicipio",
-                            @onchange = "ColoniaGetByIdMunicipio()"
+                            @onchange = "ColoniaGetByIdMunicipio(), ValidarDDL(this)"
                         })
                     }
                     else
@@ -199,11 +218,11 @@
                             {
                                 @class = "form-select",
                                 @required = "required",
-                                @onchange = "ColoniaGetByIdMunicipio()",
+                                @onchange = "ColoniaGetByIdMunicipio(), ValidarDDL(this)",
                                 @id = "ddlMunicipio"
                             })
                     }
-
+                    <span class="error"></span>
                 </div>
             </div>
             <div class="col-6">
@@ -213,11 +232,12 @@
                         @Html.DropDownListFor(model => model.Direccion.Colonia.IdColonia,
                         new SelectList(Model.Direccion.Colonia.Colonias, "IdColonia", "Nombre"),
                         "Selecciona una colonia", new
-                            {
-                                @class = "form-select",
-                                @required = "required",
-                                @id = "ddlColonia"
-                            })
+                        {
+                            @class = "form-select",
+                            @required = "required",
+                            @id = "ddlColonia",
+                            @onchange = "ValidarDDL(this)"
+                        })
                     }
                     else
                     {
@@ -227,20 +247,20 @@
                         {
                             @class = "form-select",
                             @required = "required",
-                            @id = "ddlColonia"
-                         })
+                            @id = "ddlColonia",
+                            @onchange = "ValidarDDL(this)"
+                        })
                     }
+                    <span class="error"></span>
 
                 </div>
             </div>
         </div>
-        <div class="row mt-5">
-
+        <div class="form-group mt-4">
+            <button type="submit" class="btn btn-success">Guardar</button>
         </div>
     </div>
-    <div class="form-group mt-4">
-        <button type="submit" class="btn btn-success">Guardar</button>
-    </div>
+
 
 }
 
@@ -251,11 +271,155 @@
 <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
 <script>
 
+    // Función para validar todo el formulario
+    document.getElementById("miFormulario").addEventListener("submit", function (event) {
+        // Obtener todos los inputs del formulario
+        let inputs = document.querySelectorAll("input");
+        let contador = 0;
+
+        // Contar los que tienen borde verde
+        inputs.forEach(input => {
+            let estilo = window.getComputedStyle(input);
+            if (estilo.borderColor === "rgb(0, 128, 0)") { // Verde en RGB
+                contador++;
+            }
+        });
+
+        if (contador !== 18) {
+            event.preventDefault(); // Evita el envío del formulario
+            document.getElementById("mensaje").innerText = "Llena todos los campos de manera correcta.";
+        } else {
+            document.getElementById("mensaje").innerText = ""; // Borra el mensaje si todo está bien
+        }
+    });
+
+    //validar campos de direccion
+    function ValidarDireccion(input) {
+        var direccion = input.value;
+        var regexDireccion = /^[A-Za-z0-9\s]+$/g;
+
+        var errorMessage = input.parentNode.querySelector('.error');
+
+        // Limpiar mensaje de error
+        errorMessage.textContent = '';
+
+        // Validar si direccion esta bienn
+        if (regexDireccion.test(direccion)) {
+            // cambiar el borde a verde
+            input.style.borderColor = "green";
+            errorMessage.style.display = "none";
+        } else {
+            // Si no es válido, cambiar el borde a rojo y mostrar el span
+            input.style.borderColor = "red";
+            errorMessage.style.display = "inline";
+            errorMessage.textContent = 'No es valido';
+        }
+    }
+
+    //validar que los ddl no esten vacios
+    function ValidarDDL(input) {
+        var ddl = input.value;
+        var regexFecha = /\d{1,2}\/\d{1,2}\/\d{2,4}/;
+
+        var errorMessage = input.parentNode.querySelector('.error');
+
+        // Limpiar mensaje de error
+        errorMessage.textContent = '';
+
+        // Validar si el ddl esta bienn
+        if (ddl!=null && ddl!=" ") {
+            // cambiar el borde a verde
+            input.style.borderColor = "green";
+            errorMessage.style.display = "none";
+        } else {
+            // Si no es válido, cambiar el borde a rojo y mostrar el span
+            input.style.borderColor = "red";
+            errorMessage.style.display = "inline";
+            errorMessage.textContent = 'La fecha no es valida';
+        }
+
+    }
+
+    //Validar fecha
+    function validarFecha(input) {
+        var fecha = input.value;
+
+        // Expcxresión regular
+        var regexFecha = /\d{1,2}\/\d{1,2}\/\d{2,4}/;
+
+        var errorMessage = input.parentNode.querySelector('.error');
+
+        // Limpiar mensaje de error
+        errorMessage.textContent = '';
+
+        // Validar si fecha esta bienn
+        if (regexFecha.test(fecha)) {
+            // cambiar el borde a verde
+            input.style.borderColor = "green";
+            errorMessage.style.display = "none";
+        } else {
+            // Si no es válido, cambiar el borde a rojo y mostrar el span
+            input.style.borderColor = "red";
+            errorMessage.style.display = "inline";
+            errorMessage.textContent = 'La fecha no es valida';
+        }
+
+    }
+
+    //validar contraseña
+    function validarPassword(input) {
+        var password = input.value;
+
+        // Expcxresión regular
+        var regexPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@@$!%*?&])([A-Za-z\d$@@$!%*?&]|[^ ]){8,15}$/;
+
+        var errorMessage = input.parentNode.querySelector('.error');
+
+        // Limpiar mensaje de error
+        errorMessage.textContent = '';
+
+        // Validar si el PASSWORD esta bienn
+        if (regexPassword.test(password)) {
+            // cambiar el borde a verde
+            input.style.borderColor = "green";
+            errorMessage.style.display = "none";
+        } else {
+            // Si no es válido, cambiar el borde a rojo y mostrar el span
+            input.style.borderColor = "red";
+            errorMessage.style.display = "inline";
+            errorMessage.textContent = 'La contraseña no es valida';
+        }
+
+    }
+
+    //confirmar contraseña
+    function ConfirmarPassword(input){
+        var passwordValor = $('#inptPassword').val();
+        var confirmarPasswordValor = $('#inptConfirmarPassword').val();
+
+        var errorMessage = input.parentNode.querySelector('.error');
+
+        // Limpiar mensaje de error
+        errorMessage.textContent = '';
+
+        if ((passwordValor == confirmarPasswordValor) && (confirmarPasswordValor!="")) {
+            // cambiar el borde a verde
+            input.style.borderColor = "green";
+            errorMessage.style.display = "none";
+        }
+        else {
+            input.style.borderColor = "red";
+            errorMessage.style.display = "inline";
+            errorMessage.textContent = 'La contraseña no es igual';
+        }
+
+    }
+
     //validar correo electronico
     function validarEmail(input) {
         var email = input.value;
 
-        // Expcxdfresión regular
+        // Expcxresión regular
         var regexEmail = /^\w+([.-_+]?\w+)*@@\w+([.-]?\w+)*(\.\w{2,10})+$/;
 
         var errorMessage = input.parentNode.querySelector('.error');
@@ -292,11 +456,11 @@
 
         // Validar si el CURP cumple con el formato
         if (regexCurp.test(curp)) {
-            // Si es válido, cambiar el borde a verde
+            // Si es válid se cambia el borde a verde
             input.style.borderColor = "green";
-            errorMessage.style.display = "none"; // Ocultar mensaje de error
+            errorMessage.style.display = "none"; // Ocultar
         } else {
-            // Si no es válido, cambiar el borde a rojo
+            // Si no es válido se cambia el borde a rojo
             input.style.borderColor = "red";
             errorMessage.style.display = "inline"; // Mostrar mensaje de error
             errorMessage.textContent = 'El CURP es erróneo.'; // Mostrar mensaje de error
@@ -320,7 +484,7 @@
         }
     }
 
-    //VALIDACION PARA TELEFONO SOLO NUMEROS 
+    //VALIDACION PARA TELEFONO SOLO NUMEROS
     function SoloNumeros(evento) {
         var entrada = String.fromCharCode(evento.which)
         var inputField = evento.target;
@@ -337,6 +501,28 @@
         }
     }
 
+    //validar campo de user name
+    function ValidarUserName(input) {
+        var userName = input.value;
+        var regexUserName = /^[A-Za-z0-9\s]+$/g;
+
+        var errorMessage = input.parentNode.querySelector('.error');
+
+        // Limpiar mensaje de error
+        errorMessage.textContent = '';
+
+        // Validar si el nombre de usuario esta bienn
+        if (regexUserName.test(userName)) {
+            // cambiar el borde a verde
+            input.style.borderColor = "green";
+            errorMessage.style.display = "none";
+        } else {
+            // Si no es válido, cambiar el borde a rojo y mostrar el span
+            input.style.borderColor = "red";
+            errorMessage.style.display = "inline";
+            errorMessage.textContent = 'No es valido el nombre de usuario';
+        }
+    }
 
 
     $("#datepicker").datepicker();
