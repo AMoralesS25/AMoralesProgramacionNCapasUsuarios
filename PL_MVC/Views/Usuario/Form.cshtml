@@ -257,7 +257,7 @@
             </div>
         </div>
         <div class="form-group mt-4">
-            <button type="submit" class="btn btn-success">Guardar</button>
+            <button type="submit" class="btn btn-success" onclick="validarFormulario()">Guardar</button>
         </div>
     </div>
 
@@ -272,26 +272,25 @@
 <script>
 
     // Función para validar todo el formulario
-    document.getElementById("miFormulario").addEventListener("submit", function (event) {
-        // Obtener todos los inputs del formulario
-        let inputs = document.querySelectorAll("input");
-        let contador = 0;
+    function validarFormulario() {
+        var inputs = document.querySelectorAll('input, select, textarea');
+        var esValido = true;
 
-        // Contar los que tienen borde verde
-        inputs.forEach(input => {
-            let estilo = window.getComputedStyle(input);
-            if (estilo.borderColor === "rgb(0, 128, 0)") { // Verde en RGB
-                contador++;
+        inputs.forEach(function(input) {
+            if (input.type !== "file" && input.name !== "Sexo") {
+                // Validar cada campo general, ignorando imagen y sexo
+                validarCamposGenerales(input);
+
+                if (input.style.borderColor === "red") {
+                    esValido = false;
+                }
             }
         });
 
-        if (contador !== 18) {
-            event.preventDefault(); // Evita el envío del formulario
-            document.getElementById("mensaje").innerText = "Llena todos los campos de manera correcta.";
-        } else {
-            document.getElementById("mensaje").innerText = ""; // Borra el mensaje si todo está bien
-        }
-    });
+        // Si algún campo es inválido, no enviamos el formulario
+        return esValido;
+    }
+
 
     //validar campos de direccion
     function ValidarDireccion(input) {
