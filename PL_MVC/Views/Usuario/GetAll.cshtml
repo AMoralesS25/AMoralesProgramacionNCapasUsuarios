@@ -9,13 +9,42 @@
 
 <h2>Usuarios</h2>
 
+@*carga masiva*@
+@using (Html.BeginForm("CargaMasiva", "Usuario", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+    <div class="container mt-4">
+        <div class="form-group mt-4">
+            <div class="accordionTitleCarga">
+                <a class="btn btn-info">
+                    <i class="bi bi-floppy-fill"> Carga Masiva</i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-contentCarga">
+        <div class="container mt-4">
+            <div class="row mt-5">
+                <div class="col">
+                    <div class="form-group mt-2">
+                        <input type="file" accept=".xlsx" name="inptFileExcel" onchange="ValidarExcel()" id="inptFileImagen" />
+                    </div>
+                </div>
+            </div>
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-success">Cargar</button>
+            </div>
+        </div>
+    </div>
+}
+
+
 @using (Html.BeginForm("GetAll", "Usuario", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
     <div class="container mt-4">
         <div class="form-group mt-4">
             <div class="accordionTitle">
                 <a class="btn btn-info">
-                    <i class="bi bi-search-heart-fill">Busqueda</i>
+                    <i class="bi bi-search-heart-fill"> Busqueda</i>
                 </a>
             </div>
         </div>
@@ -202,10 +231,10 @@ else
 
     //Para el acordeon de busqueda
     // Seleccionamos el título del acordeón
-    const accordionTitle = document.querySelector(".accordionTitle");
+    var accordionTitle = document.querySelector(".accordionTitle");
 
     accordionTitle.addEventListener("click", () => {
-        const accordionContent = document.querySelector(".accordion-content");
+        var accordionContent = document.querySelector(".accordion-content");
 
         // Alternamos la visibilidad del contenido
         if (accordionContent.style.display === "none" || accordionContent.style.display === "") {
@@ -215,6 +244,37 @@ else
         }
     });
 
+    //Para el acordeon de la carga masiva
+    // Seleccionamos el título del acordeón
+    var accordionTitle = document.querySelector(".accordionTitleCarga");
+
+    accordionTitle.addEventListener("click", () => {
+        var accordionContent = document.querySelector(".accordion-contentCarga");
+
+        if (accordionContent.style.display === "none" || accordionContent.style.display === "") {
+            accordionContent.style.display = "block"; // Mostrar el contenido
+        } else {
+            accordionContent.style.display = "none"; // Ocultar el contenido
+        }
+    });
+
+    //validar archivo de excel
+    function validarImagen() {
+        var input = $('#inptFileExcel')[0].files[0].name.split('.').pop().toLowerCase()
+        console.log(input)
+
+        var extensionesValidas = 'xlsx'
+        var banderaImg = false;
+
+        if (input == extensionesValidas) {
+            banderaImg = true
+        }
+
+        if (!banderaImg) {
+            alert(`Las extensiones permitidas son: ${extensionesValidas}`)
+            $('#inptFileImagen').val("");
+        }
+    }
 </script>
 
 

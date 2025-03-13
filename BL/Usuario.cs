@@ -4,10 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity.Core.Objects;
+using System.Data.OleDb;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Remoting.Contexts;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -409,7 +412,7 @@ namespace BL
                 {
                     int rowsAffect = context.UsuarioAdd(usuario.UserName, usuario.Nombre, usuario.ApellidoPaterno,
                         usuario.ApellidoMaterno, usuario.Email, usuario.Password, DateTime.Parse(usuario.FechaNacimiento.ToString()),
-                        usuario.Sexo, usuario.Telefono, usuario.Celular, usuario.Estatus, usuario.CURP, usuario.Imagen, 
+                        usuario.Sexo, usuario.Telefono, usuario.Celular, usuario.Estatus, usuario.CURP, usuario.Imagen,
                         usuario.Rol.IdRol, usuario.Direccion.Calle, usuario.Direccion.NumeroExterior, usuario.Direccion.NumeroInterior, usuario.Direccion.Colonia.IdColonia);
                     if (rowsAffect > 0)
                     {
@@ -529,9 +532,9 @@ namespace BL
                             usuario.CURP = objBD.CURP;
                             usuario.Imagen = objBD.Imagen;
                             usuario.Rol.Nombre = objBD.NombreRol;
-                            usuario.Direccion.Calle=objBD.Calle;
-                            usuario.Direccion.NumeroExterior=objBD.NumeroExterior;
-                            usuario.Direccion.NumeroInterior=objBD.NumeroInterior;
+                            usuario.Direccion.Calle = objBD.Calle;
+                            usuario.Direccion.NumeroExterior = objBD.NumeroExterior;
+                            usuario.Direccion.NumeroInterior = objBD.NumeroInterior;
                             usuario.Direccion.Colonia.Nombre = objBD.NombreColonia;
                             usuario.Direccion.Colonia.CodigoPostal = objBD.CodigoPostal;
                             usuario.Direccion.Colonia.Municipio.Nombre = objBD.NombreMunicipio;
@@ -985,6 +988,211 @@ namespace BL
         //    }
         //    return result;
         //}
+
+        public static ML.Result CargaMasiva()
+        {
+            ML.Result result = new ML.Result();
+            string ruta = @"C:\Users\digis\Downloads\CargaMasiva.txt";
+            try
+            {
+                StreamReader streamReader = new StreamReader(ruta);
+                string fila = "";
+
+                streamReader.ReadLine();
+
+                while ((fila = streamReader.ReadLine()) != null)
+                {
+                    string[] valores = fila.Split('|');
+
+                    ML.Usuario usuario = new ML.Usuario();
+                    usuario.UserName = valores[0];
+                    usuario.Nombre = valores[1];
+                    usuario.ApellidoPaterno = valores[2];
+                    usuario.ApellidoMaterno = valores[3];
+                    usuario.Nombre = valores[4];
+
+
+                    BL.Usuario.AddEF(usuario);
+                    result.Correct = true;
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+            return result;
+        }
+
+        public static ML.Result LeerExcel(string cadenaConexion)
+        {
+            ML.Result result = new ML.Result();
+            try
+            {
+                using (OleDbConnection context = new OleDbConnection(cadenaConexion))
+                {
+                    string query = "SELECT * FROM [Sheet1$]";
+                    using (OleDbCommand cmd = new OleDbCommand())
+                    {
+                        cmd.CommandText = query;
+                        cmd.Connection = context;
+
+                        OleDbDataAdapter adapter = new OleDbDataAdapter();
+                        adapter.SelectCommand = cmd;
+
+                        DataTable tablaUsuario = new DataTable();
+                        adapter.Fill(tablaUsuario);
+
+                        if (tablaUsuario.Rows.Count > 0)
+                        {
+                            result.Objects = new List<object>();
+                            foreach (DataRow row in tablaUsuario.Rows)
+                            {
+                                ML.Usuario usuario = new ML.Usuario();
+                                usuario.Rol = new ML.Rol();
+                                usuario.Direccion = new ML.Direccion();
+                                usuario.Direccion.Colonia = new ML.Colonia();
+                                usuario.UserName = row[0].ToString();
+                                usuario.Nombre = row[1].ToString();
+                                usuario.ApellidoPaterno = row[2].ToString();
+                                usuario.ApellidoMaterno = row[3].ToString();
+                                usuario.Email = row[4].ToString();
+                                usuario.Password = row[5].ToString();
+                                usuario.FechaNacimiento = row[6].ToString();
+                                usuario.Sexo = row[7].ToString();
+                                usuario.Telefono = row[8].ToString();
+                                usuario.Celular = row[9].ToString();
+                                usuario.Estatus = Convert.ToBoolean(row[10].ToString());
+                                usuario.CURP = row[11].ToString();
+                                usuario.Imagen = null;
+                                usuario.Rol.IdRol = Convert.ToInt16(row[12]);
+                                usuario.Direccion.Calle = row[13].ToString();
+                                usuario.Direccion.NumeroExterior = row[14].ToString();
+                                usuario.Direccion.NumeroInterior = row[15].ToString();
+                                usuario.Direccion.Colonia.IdColonia = Convert.ToInt16(row[16]);
+
+                                result.Objects.Add(usuario);
+
+                            }
+                            result.Correct = true;
+                        }
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Correct = false;
+                result.ErrorMessage = ex.Message;
+                result.Ex = ex;
+            }
+            return result;
+        }
+
+        public static ML.ResultExcel ValidarExcel(List<object> registros)
+        {
+            ML.ResultExcel result = new ML.ResultExcel();
+            result.Errores = new List<object>();
+
+            int contador = 1;
+
+            foreach (ML.Usuario usuario in registros)
+            {
+                result.NumeroRegistro = contador;
+
+                if (usuario.UserName.Length > 50 || usuario.UserName == " " || usuario.UserName == null)
+                {
+                    result.ErrorMessage += "El username es muy largo o vacío";
+                }
+
+                if (usuario.Nombre.Length > 50 || usuario.Nombre == " " || usuario.Nombre == null)
+                {
+                    result.ErrorMessage += "El nombre es muy largo o vacío";
+                }
+
+                if (usuario.ApellidoPaterno.Length > 50 || usuario.ApellidoPaterno == " " || usuario.ApellidoPaterno == null)
+                {
+                    result.ErrorMessage += "El apellido paterno es muy largo o vacío";
+                }
+
+                if (usuario.ApellidoMaterno.Length > 50 || usuario.ApellidoMaterno == " " || usuario.ApellidoMaterno == null)
+                {
+                    result.ErrorMessage += "El apellido materno es muy largo o vacío";
+                }
+
+                if (usuario.Email.Length > 254 || usuario.Email == " " || usuario.Email == null)
+                {
+                    result.ErrorMessage += "El email es muy largo o vacío";
+                }
+
+                if (usuario.Password.Length > 50 || usuario.Password == " " || usuario.Password == null)
+                {
+                    result.ErrorMessage += "El password es muy largo o vacío";
+                }
+
+                if (usuario.FechaNacimiento.Length > 50 || usuario.FechaNacimiento == " " || usuario.FechaNacimiento == null)
+                {
+                    result.ErrorMessage += "La fecha de nacimiento es muy largo o vacío";
+                }
+
+                if (usuario.Sexo.Length > 2 || usuario.Sexo == " " || usuario.Sexo == null)
+                {
+                    result.ErrorMessage += "El campo sexo es muy largo o vacío";
+                }
+
+                if (usuario.Telefono.Length > 20 || usuario.Telefono == " " || usuario.Telefono == null)
+                {
+                    result.ErrorMessage += "El telefono es muy largo o vacío";
+                }
+
+                if (usuario.Celular.Length > 20 || usuario.Celular == " " || usuario.Celular == null)
+                {
+                    result.ErrorMessage += "El celular es muy largo o vacío";
+                }
+
+                if (usuario.CURP.Length > 50 || usuario.CURP == " " || usuario.CURP == null)
+                {
+                    result.ErrorMessage += "El CURP es muy largo o vacío";
+                }
+
+                if (usuario.Rol.IdRol==0 || usuario.Rol.IdRol == null)
+                {
+                    result.ErrorMessage += "El rol es vacío";
+                }
+
+                if (usuario.Direccion.Calle.Length > 50 || usuario.Direccion.Calle == " " || usuario.Direccion.Calle == null)
+                {
+                    result.ErrorMessage += "La calle es muy larga o es vacía";
+                }
+
+                if (usuario.Direccion.NumeroInterior.Length > 20 || usuario.Direccion.NumeroInterior == " " || usuario.Direccion.NumeroInterior == null)
+                {
+                    result.ErrorMessage += "El número interior es muy largo o es vacío";
+                }
+
+                if (usuario.Direccion.NumeroExterior.Length > 20 || usuario.Direccion.NumeroExterior == " " || usuario.Direccion.NumeroExterior == null)
+                {
+                    result.ErrorMessage += "El numero exterior es muy largo o es vacío";
+                }
+
+                if (usuario.Direccion.Colonia.IdColonia == 0 || usuario.Direccion.Colonia.IdColonia == null)
+                {
+                   result.ErrorMessage += "La colonia es vacía";
+                }
+
+                if(result.ErrorMessage!=" " || result.ErrorMessage != null)
+                {
+                    result.Errores.Add(result);
+                }
+
+                contador++;
+            }
+
+            return result;
+        }
     }
 
 }

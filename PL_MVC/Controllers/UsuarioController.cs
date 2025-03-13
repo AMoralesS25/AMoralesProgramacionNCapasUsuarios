@@ -1,7 +1,10 @@
 ﻿using PL_MVC.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity.Core.Objects;
+using System.Data.OleDb;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Web;
@@ -166,6 +169,46 @@ namespace PL_MVC.Controllers
             return Json(JsonResult, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpPost]
+        public ActionResult CargaMasiva()
+        {
+            HttpPostedFileBase excelUsuario = Request.Files["inptFileExcel"];
+            string extensionPermitida = ".xlsx";
 
+            if (excelUsuario.ContentLength > 0)
+            {
+                string extensionObtenida = Path.GetExtension(excelUsuario.FileName);
+
+                if (extensionObtenida == extensionPermitida)
+                {
+                    string ruta=Server.MapPath("~/CargaMasiva/")+Path.GetFileNameWithoutExtension(excelUsuario.FileName)+"-"+
+                        DateTime.Now.ToString("ddMMyyyyHmmssff")+ ".xlsx";
+                    if (!System.IO.File.Exists(ruta))
+                    {
+                        excelUsuario.SaveAs(ruta);
+                        string cadenaConexion = ConfigurationManager.ConnectionStrings["OleDbConnection"] + ruta;
+                        ML.Result resultExcel=BL.Usuario.LeerExcel(cadenaConexion);
+
+                        if (resultExcel.Objects.Count > 0)
+                        {
+                            ML.ResultExcel resultValidacion = BL.Usuario.ValidarExcel(resultExcel.Objects);
+                        }
+                    }
+                    else
+                    {
+                        //vista parcial
+                    }
+                }
+                else
+                {
+                    //vista parcial
+                }
+            }
+            else
+            {
+                //vista parcial
+            }
+            return RedirectToAction("GetAll", "Usuario");
+        }
     }
 }
