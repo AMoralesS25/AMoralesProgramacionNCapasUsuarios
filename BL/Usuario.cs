@@ -1065,15 +1065,29 @@ namespace BL
                                 usuario.Sexo = row[7].ToString();
                                 usuario.Telefono = row[8].ToString();
                                 usuario.Celular = row[9].ToString();
-                                usuario.Estatus = Convert.ToBoolean(row[10].ToString());
-                                usuario.CURP = row[11].ToString();
+                                //usuario.Estatus = Convert.ToBoolean(row[10].ToString());
+                                usuario.CURP = row[10].ToString();
                                 usuario.Imagen = null;
-                                usuario.Rol.IdRol = Convert.ToInt16(row[12]);
-                                usuario.Direccion.Calle = row[13].ToString();
-                                usuario.Direccion.NumeroExterior = row[14].ToString();
-                                usuario.Direccion.NumeroInterior = row[15].ToString();
-                                usuario.Direccion.Colonia.IdColonia = Convert.ToInt16(row[16]);
-
+                                if (row[11] == DBNull.Value || string.IsNullOrEmpty(row[11].ToString()))
+                                {
+                                    usuario.Rol.IdRol = 0;
+                                }
+                                else
+                                {
+                                    usuario.Rol.IdRol = Convert.ToInt16(row[11]);
+                                }
+                                usuario.Direccion.Calle = row[12].ToString();
+                                usuario.Direccion.NumeroExterior = row[13].ToString();
+                                usuario.Direccion.NumeroInterior = row[14].ToString();
+                                if (row[15] == DBNull.Value || string.IsNullOrEmpty(row[15].ToString()))
+                                {
+                                    usuario.Direccion.Colonia.IdColonia = 0;
+                                }
+                                else
+                                {
+                                    usuario.Direccion.Colonia.IdColonia = Convert.ToInt16(row[15]);
+                                }
+                                
                                 result.Objects.Add(usuario);
 
                             }
@@ -1088,6 +1102,7 @@ namespace BL
                 result.Correct = false;
                 result.ErrorMessage = ex.Message;
                 result.Ex = ex;
+
             }
             return result;
         }
@@ -1101,91 +1116,93 @@ namespace BL
 
             foreach (ML.Usuario usuario in registros)
             {
-                result.NumeroRegistro = contador;
+                ML.ResultExcel resultValidacion = new ML.ResultExcel();
 
-                if (usuario.UserName.Length > 50 || usuario.UserName == " " || usuario.UserName == null)
+                resultValidacion.NumeroRegistro = contador;
+
+                if (usuario.UserName.Length > 50 || usuario.UserName == "" || usuario.UserName == null)
                 {
-                    result.ErrorMessage += "El username es muy largo o vacío";
+                    resultValidacion.ErrorMessage += "La columna username (A" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.Nombre.Length > 50 || usuario.Nombre == " " || usuario.Nombre == null)
+                if (usuario.Nombre.Length > 50 || usuario.Nombre == "" || usuario.Nombre == null)
                 {
-                    result.ErrorMessage += "El nombre es muy largo o vacío";
+                    resultValidacion.ErrorMessage += "La columna nombre (B" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.ApellidoPaterno.Length > 50 || usuario.ApellidoPaterno == " " || usuario.ApellidoPaterno == null)
+                if (usuario.ApellidoPaterno.Length > 50 || usuario.ApellidoPaterno == "" || usuario.ApellidoPaterno == null)
                 {
-                    result.ErrorMessage += "El apellido paterno es muy largo o vacío";
+                    resultValidacion.ErrorMessage += "La columna apellido paterno (C" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.ApellidoMaterno.Length > 50 || usuario.ApellidoMaterno == " " || usuario.ApellidoMaterno == null)
+                if (usuario.ApellidoMaterno.Length > 50 || usuario.ApellidoMaterno == "" || usuario.ApellidoMaterno == null)
                 {
-                    result.ErrorMessage += "El apellido materno es muy largo o vacío";
+                    resultValidacion.ErrorMessage += "La columna apellido materno (D" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.Email.Length > 254 || usuario.Email == " " || usuario.Email == null)
+                if (usuario.Email.Length > 254 || usuario.Email == "" || usuario.Email == null)
                 {
-                    result.ErrorMessage += "El email es muy largo o vacío";
+                    resultValidacion.ErrorMessage += "La columna email (E" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.Password.Length > 50 || usuario.Password == " " || usuario.Password == null)
+                if (usuario.Password.Length > 50 || usuario.Password == "" || usuario.Password == null)
                 {
-                    result.ErrorMessage += "El password es muy largo o vacío";
+                    resultValidacion.ErrorMessage += "La columna password (F" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.FechaNacimiento.Length > 50 || usuario.FechaNacimiento == " " || usuario.FechaNacimiento == null)
+                if (usuario.FechaNacimiento.Length > 50 || usuario.FechaNacimiento == "" || usuario.FechaNacimiento == null)
                 {
-                    result.ErrorMessage += "La fecha de nacimiento es muy largo o vacío";
+                    resultValidacion.ErrorMessage += "La columna fecha de nacimiento (G" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.Sexo.Length > 2 || usuario.Sexo == " " || usuario.Sexo == null)
+                if (usuario.Sexo.Length > 2 || usuario.Sexo == "" || usuario.Sexo == null)
                 {
-                    result.ErrorMessage += "El campo sexo es muy largo o vacío";
+                    resultValidacion.ErrorMessage += "La columna sexo (H" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.Telefono.Length > 20 || usuario.Telefono == " " || usuario.Telefono == null)
+                if (usuario.Telefono.Length > 20 || usuario.Telefono == "" || usuario.Telefono == null)
                 {
-                    result.ErrorMessage += "El telefono es muy largo o vacío";
+                    resultValidacion.ErrorMessage += " \n La columna telefono (I" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.Celular.Length > 20 || usuario.Celular == " " || usuario.Celular == null)
+                if (usuario.Celular.Length > 20 || usuario.Celular == "" || usuario.Celular == null)
                 {
-                    result.ErrorMessage += "El celular es muy largo o vacío";
+                    resultValidacion.ErrorMessage += "La columna celular (J" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.CURP.Length > 50 || usuario.CURP == " " || usuario.CURP == null)
+                if (usuario.CURP.Length > 50 || usuario.CURP == "" || usuario.CURP == null)
                 {
-                    result.ErrorMessage += "El CURP es muy largo o vacío";
+                    resultValidacion.ErrorMessage += "La columna CURP (K" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.Rol.IdRol==0 || usuario.Rol.IdRol == null)
+                if (usuario.Rol.IdRol == 0 || usuario.Rol.IdRol == null)
                 {
-                    result.ErrorMessage += "El rol es vacío";
+                    resultValidacion.ErrorMessage += " La columna Id rol (L" + (contador + 1) + ") tiene un error porque es vacía o es igual a cero. ";
                 }
 
-                if (usuario.Direccion.Calle.Length > 50 || usuario.Direccion.Calle == " " || usuario.Direccion.Calle == null)
+                if (usuario.Direccion.Calle.Length > 50 || usuario.Direccion.Calle == "" || usuario.Direccion.Calle == null)
                 {
-                    result.ErrorMessage += "La calle es muy larga o es vacía";
+                    resultValidacion.ErrorMessage += "La columna calle (M" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.Direccion.NumeroInterior.Length > 20 || usuario.Direccion.NumeroInterior == " " || usuario.Direccion.NumeroInterior == null)
+                if (usuario.Direccion.NumeroInterior.Length > 20 || usuario.Direccion.NumeroInterior == "" || usuario.Direccion.NumeroInterior == null)
                 {
-                    result.ErrorMessage += "El número interior es muy largo o es vacío";
+                    resultValidacion.ErrorMessage += "La columna numero interior (N" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
-                if (usuario.Direccion.NumeroExterior.Length > 20 || usuario.Direccion.NumeroExterior == " " || usuario.Direccion.NumeroExterior == null)
+                if (usuario.Direccion.NumeroExterior.Length > 20 || usuario.Direccion.NumeroExterior == "" || usuario.Direccion.NumeroExterior == null)
                 {
-                    result.ErrorMessage += "El numero exterior es muy largo o es vacío";
+                    resultValidacion.ErrorMessage += "La columna numero exterior (O" + (contador + 1) + ") tiene un error porque excede el número de caracteres permitidos o es vacía. ";
                 }
 
                 if (usuario.Direccion.Colonia.IdColonia == 0 || usuario.Direccion.Colonia.IdColonia == null)
                 {
-                   result.ErrorMessage += "La colonia es vacía";
+                    resultValidacion.ErrorMessage += "La columna Id colonia (P" + (contador + 1) + ") tiene un error porque es vacía o es igual a cero. ";
                 }
 
-                if(result.ErrorMessage!=" " || result.ErrorMessage != null)
+                if (resultValidacion.ErrorMessage != null)
                 {
-                    result.Errores.Add(result);
+                    result.Errores.Add(resultValidacion);
                 }
 
                 contador++;

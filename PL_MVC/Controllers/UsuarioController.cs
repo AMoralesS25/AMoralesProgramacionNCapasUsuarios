@@ -1,4 +1,5 @@
-﻿using PL_MVC.Models;
+﻿using ML;
+using PL_MVC.Models;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -45,13 +46,13 @@ namespace PL_MVC.Controllers
         [HttpPost]
         public ActionResult GetAll(ML.Usuario usuario)
         {
-            
+
             usuario.Nombre = usuario.Nombre == null ? "" : usuario.Nombre;
             usuario.ApellidoPaterno = usuario.ApellidoPaterno == null ? "" : usuario.ApellidoPaterno;
             usuario.ApellidoMaterno = usuario.ApellidoMaterno == null ? "" : usuario.ApellidoMaterno;
             usuario.Rol.IdRol = usuario.Rol.IdRol == 0 ? 0 : usuario.Rol.IdRol;
 
-            
+
             ML.Result result = BL.Usuario.GetAllEF(usuario);
 
             if (result.Correct)
@@ -123,13 +124,32 @@ namespace PL_MVC.Controllers
 
             if (usuario.IdUsuario == 0)
             {
-                BL.Usuario.AddEF(usuario);
-                return RedirectToAction("GetAll", "Usuario");
+               ML.Result result = BL.Usuario.AddEF(usuario);
+
+                if (result.Correct)
+                {
+                    ViewBag.MensajeVerificado = "Se agrego el usuario de manera correcta";
+                    return PartialView("_NotificacionDeEstado");
+                }
+                else
+                {
+                    ViewBag.MensajeVerificado = "Hubo un error al agregar el usuario";
+                    return PartialView("_NotificacionDeEstado");
+                }
             }
             else
             {
-                BL.Usuario.UpdateEF(usuario);
-                return RedirectToAction("GetAll", "Usuario");
+                ML.Result result = BL.Usuario.UpdateEF(usuario);
+                if (result.Correct)
+                {
+                    ViewBag.MensajeVerificado = "Se actualizo el usuario de manera correcta";
+                    return PartialView("_NotificacionDeEstado");
+                }
+                else
+                {
+                    ViewBag.MensajeVerificado = "Hubo un error al actualizar el usuario";
+                    return PartialView("_NotificacionDeEstado");
+                }
             }
         }
 
@@ -144,8 +164,17 @@ namespace PL_MVC.Controllers
         public ActionResult Delete(int IdUsuario)
         {
 
-            BL.Usuario.DeleteEF(IdUsuario);
-            return RedirectToAction("GetAll", "Usuario");
+            ML.Result result = BL.Usuario.DeleteEF(IdUsuario);
+            if (result.Correct)
+            {
+                ViewBag.MensajeVerificado = "Se elimino el usuario de manera correcta";
+                return PartialView("_NotificacionDeEstado");
+            }
+            else
+            {
+                ViewBag.MensajeVerificado = "Hubo un error al eliminar el usuario";
+                return PartialView("_NotificacionDeEstado");
+            }
         }
 
         [HttpPost]
@@ -172,43 +201,133 @@ namespace PL_MVC.Controllers
         [HttpPost]
         public ActionResult CargaMasiva()
         {
-            HttpPostedFileBase excelUsuario = Request.Files["inptFileExcel"];
-            string extensionPermitida = ".xlsx";
-
-            if (excelUsuario.ContentLength > 0)
+            if (Session["RutaExcel"] == null)
             {
-                string extensionObtenida = Path.GetExtension(excelUsuario.FileName);
+                HttpPostedFileBase excelUsuario = Request.Files["inptFileExcel"];
+                string extensionPermitida = ".xlsx";
 
-                if (extensionObtenida == extensionPermitida)
+                if (excelUsuario.ContentLength > 0)
                 {
-                    string ruta=Server.MapPath("~/CargaMasiva/")+Path.GetFileNameWithoutExtension(excelUsuario.FileName)+"-"+
-                        DateTime.Now.ToString("ddMMyyyyHmmssff")+ ".xlsx";
-                    if (!System.IO.File.Exists(ruta))
-                    {
-                        excelUsuario.SaveAs(ruta);
-                        string cadenaConexion = ConfigurationManager.ConnectionStrings["OleDbConnection"] + ruta;
-                        ML.Result resultExcel=BL.Usuario.LeerExcel(cadenaConexion);
+                    string extensionObtenida = Path.GetExtension(excelUsuario.FileName);
 
-                        if (resultExcel.Objects.Count > 0)
+                    if (extensionObtenida == extensionPermitida)
+                    {
+                        string ruta = Server.MapPath("~/CargaMasiva/") + Path.GetFileNameWithoutExtension(excelUsuario.FileName) + "-" +
+                            DateTime.Now.ToString("ddMMyyyyHmmssff") + ".xlsx";
+                        if (!System.IO.File.Exists(ruta))
                         {
-                            ML.ResultExcel resultValidacion = BL.Usuario.ValidarExcel(resultExcel.Objects);
+                            excelUsuario.SaveAs(ruta);
+                            string cadenaConexion = ConfigurationManager.ConnectionStrings["OleDbConnection"] + ruta;
+                            ML.Result resultExcel = BL.Usuario.LeerExcel(cadenaConexion);
+
+                            if (resultExcel.Correct)
+                            {
+                                ML.ResultExcel resultValidacion = BL.Usuario.ValidarExcel(resultExcel.Objects);
+
+                                if (resultValidacion.Errores.Count > 0)
+                                {
+                                    //hubo errores en el excel mostrar tabla 
+                                    ViewBag.ErroresExcel = resultValidacion.Errores;
+                                    return PartialView("_ErroresExcel");
+                                }
+                                else
+                                {
+                                    //ya lei y valide el excel
+                                    Session["RutaExcel"] = ruta;
+                                    ViewBag.MensajeVerificado = "No tienes errores en tu excel, oprime el boton insertar";
+                                    return PartialView("_ErroresExcel");
+
+                                }
+                            }
+                            else
+                            {
+                                ViewBag.Errores = "¡El archivo Excel que ingresaste esta vacío!";
+                                return PartialView("_ErroresExcel");
+
+                            }
+                        }
+                        else
+                        {
+                            //vista parcial, vuleve a cargar el archivo porque ya existe 
+                            ViewBag.Errores = "¡El archivo Excel que ingresaste ya existe!";
+                            return PartialView("_ErroresExcel");
                         }
                     }
                     else
                     {
-                        //vista parcial
+                        //vista parcial no es excel el archivo
+                        ViewBag.Errores = "¡El archivo que ingresaste no es un Excel!";
+                        return PartialView("_ErroresExcel");
                     }
                 }
                 else
                 {
-                    //vista parcial
+                    //vista parcial no me diste archivok
+                    ViewBag.Errores = "¡No ingresaste ningun archivo!";
+                    return PartialView("_ErroresExcel");
                 }
             }
             else
             {
-                //vista parcial
-            }
+                //insertar
+                string cadenaConexionRuta = ConfigurationManager.ConnectionStrings["OleDbConnection"] + Session["RutaExcel"].ToString();
+                ML.Result resultLeerExcel = BL.Usuario.LeerExcel(cadenaConexionRuta);
+
+                if (resultLeerExcel.Objects.Count > 0)
+                {
+                    ML.ResultExcel resultInsertExcel = new ML.ResultExcel();
+                    resultInsertExcel.Errores = new List<object>();
+
+                    int contadorInsert = 1;
+                    bool existErrores = false;
+
+                    //leyo bien 
+                    foreach (ML.Usuario usuario in resultLeerExcel.Objects)
+                    {
+                        ML.ResultExcel resultInsert = new ML.ResultExcel();
+
+                        resultInsert.NumeroRegistro = contadorInsert;
+
+                        ML.Result resultInsertar = BL.Usuario.AddEF(usuario);
+                        if (!resultInsertar.Correct)
+                        {
+                            //mostrar error message 
+                            resultInsert.ErrorMessage += "Hubo un error al insertar";
+                            existErrores = true;
+                        }
+                        else
+                        {
+                            resultInsert.ErrorMessage += "Se inserto de manera correcta";
+                        }
+                        if (resultInsert.ErrorMessage != null)
+                        {
+                            resultInsertExcel.Errores.Add(resultInsert);
+                        }
+                        contadorInsert++;
+                    }
+
+                    if (existErrores)
+                    {
+                        //hubo errores al insertar mostrar tabla 
+                        ViewBag.ErroresExcel = resultInsertExcel.Errores;
+                        Session["RutaExcel"] = null;
+                        return PartialView("_ErroresExcel");
+                    }
+                    else
+                    {
+                        ViewBag.MensajeVerificado = "Todos los inserts fueron realizados con exito";
+                        Session["RutaExcel"] = null;
+                        return PartialView("_NotificacionDeEstado");
+                    }
+                    
+
+                }
+
+            }//archivo
+
+            Session["RutaExcel"] = null;
             return RedirectToAction("GetAll", "Usuario");
+
         }
     }
 }
