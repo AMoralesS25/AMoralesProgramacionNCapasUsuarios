@@ -6,7 +6,7 @@
 
 <link rel="stylesheet" href="~/Styles/StyleForm.css" />
 
-@using (Html.BeginForm("Form", "Usuario", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+@using (Html.BeginForm("Form", "Usuario", FormMethod.Post, new { @enctype = "multipart/form-data", @id = "FormUsuario" }))
 {
     <h2>Usuario</h2>
     <hr />
@@ -105,7 +105,7 @@
                 </div>
             </div>
             <div class="col-6">
-                <divSS class="form-group mt-2 ">
+                <div class="form-group mt-2 ">
                     @Html.LabelFor(model => model.Sexo, new { @class = "form-label" })
 
                     @*@Html.TextBoxFor(model => model.Sexo, new { @class = "form-control", @required = "required" })*@
@@ -118,7 +118,7 @@
                         Mujer
                         @Html.RadioButtonFor(model => model.Sexo, "M", new { @class = "form-check-input", @required = "required" })
                     </div>
-                </divSS>
+                </div>
             </div>
         </div>
         <div class="row mt-5">
@@ -140,18 +140,14 @@
         <div class="row mt-5">
             <div class="col-6">
                 <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Rol.IdRol, new { @class = "form-label" })
+
                     @Html.DropDownListFor(model => model.Rol.IdRol, new SelectList(Model.Rol.Roles, "IdRol", "Nombre"),
-                   "Selecciona un Rol", new { @class = "form-select", @required = "required", @onchange = "ValidarDDL(this)" })
+    "Selecciona un Rol", new { @class = "form-select", @required = "required", @onchange = "ValidarDDL(this)" })
                     <span class="error"></span>
                 </div>
             </div>
-            <div class="col-6">
-                <div class="form-group mt-2">
-                    @Html.LabelFor(model => model.Estatus, new { @class = "form-label" })
-                    @Html.TextBoxFor(model => model.Estatus, new { @class = "form-control", @required = "required" })
-                    <span class="error"></span>
-                </div>
-            </div>
+            
         </div>
         <br /><br /><br />
         <h2>Dirección</h2>
@@ -182,6 +178,8 @@
             </div>
             <div class="col-6">
                 <div class="form-group mt-4">
+                    @Html.LabelFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado, new { @class = "form-label" })
+
                     @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado,
                    new SelectList(Model.Direccion.Colonia.Municipio.Estado.Estados, "IdEstado", "Nombre"),
                    "Selecciona un estado", new
@@ -198,6 +196,8 @@
         <div class="row mt-5">
             <div class="col-6">
                 <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Direccion.Colonia.Municipio.IdMunicipio, new { @class = "form-label" })
+
                     @if (Model.Direccion.Colonia.Municipio.Municipios != null || Model.Direccion.Colonia.Municipio.IdMunicipio > 0)
                     {
                         @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.IdMunicipio,
@@ -227,6 +227,8 @@
             </div>
             <div class="col-6">
                 <div class="form-group mt-2">
+                    @Html.LabelFor(model => model.Direccion.Colonia.IdColonia, new { @class = "form-label" })
+
                     @if (Model.Direccion.Colonia.Colonias != null || Model.Direccion.Colonia.IdColonia > 0)
                     {
                         @Html.DropDownListFor(model => model.Direccion.Colonia.IdColonia,
@@ -257,7 +259,7 @@
             </div>
         </div>
         <div class="form-group mt-4">
-            <button type="submit" class="btn btn-success" onclick="validarFormulario()">Guardar</button>
+            <button type="submit" class="btn btn-success" onclick="validarFormulario(event)">Guardar</button>
         </div>
     </div>
 
@@ -272,24 +274,33 @@
 <script>
 
     // Función para validar todo el formulario
-    function validarFormulario() {
+    function validarFormulario(event) {
+        event.preventDefault();  // Prevenir el envío del formulario por defecto
+
         var inputs = document.querySelectorAll('input, select, textarea');
         var esValido = true;
 
-        inputs.forEach(function(input) {
-            if (input.type !== "file" && input.name !== "Sexo") {
-                // Validar cada campo general, ignorando imagen y sexo
-                validarCamposGenerales(input);
-
-                if (input.style.borderColor === "red") {
+        // Recorrer todos los campos del formulario
+        inputs.forEach(function (input) {
+            // Ignorar los campos con id="idUsuario", name="Imagen" y name="Sexo"
+            if (input.id !== "IdUsuario" && input.name !== "Imagen" && input.name !== "Sexo" && input.type !== "file") {
+                // Verificar el borde de cada campo
+                if (input.style.borderColor !== "green") {
                     esValido = false;
                 }
             }
         });
 
-        // Si algún campo es inválido, no enviamos el formulario
-        return esValido;
+        // Si algún campo tiene borde rojo (o no es verde), no se envía el formulario
+        if (!esValido) {
+            alert("Por favor, llena y corrige los errores en los campos.");
+        } else {
+            // Si todo es válido, se envía el formulario
+            document.getElementById("FormUsuario").submit();  // Enviar el formulario manualmente
+        }
     }
+
+
 
 
     //validar campos de direccion
