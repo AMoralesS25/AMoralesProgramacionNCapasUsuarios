@@ -115,42 +115,62 @@ namespace PL_MVC.Controllers
         [HttpPost]
         public ActionResult Form(ML.Usuario usuario)
         {
-            HttpPostedFileBase file = Request.Files["inptFileImagen"];
-
-            if (file != null && file.ContentLength > 0)
+            if (ModelState.IsValid)
             {
-                usuario.Imagen = ConvertirAArrayBytes(file);
-            }
+                HttpPostedFileBase file = Request.Files["inptFileImagen"];
 
-            if (usuario.IdUsuario == 0)
-            {
-               ML.Result result = BL.Usuario.AddEF(usuario);
-
-                if (result.Correct)
+                if (file != null && file.ContentLength > 0)
                 {
-                    ViewBag.MensajeVerificado = "Se agrego el usuario de manera correcta";
-                    return PartialView("_NotificacionDeEstado");
+                    usuario.Imagen = ConvertirAArrayBytes(file);
+                }
+
+                if (usuario.IdUsuario == 0)
+                {
+                    ML.Result result = BL.Usuario.AddEF(usuario);
+
+                    if (result.Correct)
+                    {
+                        ViewBag.MensajeVerificado = "Se agrego el usuario de manera correcta";
+                        return PartialView("_NotificacionDeEstado");
+                    }
+                    else
+                    {
+                        ViewBag.MensajeVerificado = "Hubo un error al agregar el usuario";
+                        return PartialView("_NotificacionDeEstado");
+                    }
                 }
                 else
                 {
-                    ViewBag.MensajeVerificado = "Hubo un error al agregar el usuario";
-                    return PartialView("_NotificacionDeEstado");
+                    ML.Result result = BL.Usuario.UpdateEF(usuario);
+                    if (result.Correct)
+                    {
+                        ViewBag.MensajeVerificado = "Se actualizo el usuario de manera correcta";
+                        return PartialView("_NotificacionDeEstado");
+                    }
+                    else
+                    {
+                        ViewBag.MensajeVerificado = "Hubo un error al actualizar el usuario";
+                        return PartialView("_NotificacionDeEstado");
+                    }
                 }
             }
             else
             {
-                ML.Result result = BL.Usuario.UpdateEF(usuario);
-                if (result.Correct)
-                {
-                    ViewBag.MensajeVerificado = "Se actualizo el usuario de manera correcta";
-                    return PartialView("_NotificacionDeEstado");
-                }
-                else
-                {
-                    ViewBag.MensajeVerificado = "Hubo un error al actualizar el usuario";
-                    return PartialView("_NotificacionDeEstado");
-                }
+                ML.Result resultDDLMunicipio = BL.Municipio.GetByIdEstadoEF(usuario.Direccion.Colonia.Municipio.Estado.IdEstado);
+                usuario.Direccion.Colonia.Municipio.Municipios = resultDDLMunicipio.Objects;
+
+                ML.Result resultDDLColonia = BL.Colonia.GetByIdMunicipioEF(usuario.Direccion.Colonia.Municipio.IdMunicipio);
+                usuario.Direccion.Colonia.Colonias = resultDDLColonia.Objects;
+
+                ML.Result resultDDL = BL.Rol.GetAllLINQ(); 
+                usuario.Rol.Roles = resultDDL.Objects; 
+
+                ML.Result estadosDDL = BL.Estado.GetAllEF();
+                usuario.Direccion.Colonia.Municipio.Estado.Estados = estadosDDL.Objects;
+
+                return View(usuario);
             }
+            
         }
 
         public byte[] ConvertirAArrayBytes(HttpPostedFileBase Foto)
