@@ -531,6 +531,15 @@ namespace BL
                             usuario.Estatus = objBD.Estatus;
                             usuario.CURP = objBD.CURP;
                             usuario.Imagen = objBD.Imagen;
+                            if(objBD.Imagen!=null)
+                            {
+                                usuario.ImagenBase64 = Convert.ToBase64String(objBD.Imagen);
+                            }
+                            else
+                            {
+                                usuario.ImagenBase64 = null;
+                            }
+                            usuario.Imagen = objBD.Imagen;
                             usuario.Rol.Nombre = objBD.NombreRol;
                             usuario.Direccion.Calle = objBD.Calle;
                             usuario.Direccion.NumeroExterior = objBD.NumeroExterior;
@@ -560,6 +569,7 @@ namespace BL
             return result;
 
         }
+        
         public static ML.Result GetByIdEF(int idUsuario)
         {
             ML.Result result = new ML.Result();
