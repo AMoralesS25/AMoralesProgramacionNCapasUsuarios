@@ -169,6 +169,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\CandidatoController.cs" />
+    <Compile Include="Controllers\CitaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
@@ -209,6 +211,8 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
+    <Content Include="Scripts\Candidatos\AddCita.js" />
+    <Content Include="Scripts\Candidatos\CandidatosValidaciones.js" />
     <Content Include="Scripts\CRUDJS\CRUDJS.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -221,8 +225,10 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\Validaciones\Validaciones.js" />
+    <Content Include="Styles\StyleCandidatoForm.css" />
     <Content Include="Styles\StyleForm.css" />
     <Content Include="Styles\StyleGetAll.css" />
+    <Content Include="Styles\StyleGetAllCandidato.css" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -261,7 +267,6 @@
     <Content Include="Views\Usuario\Form.cshtml" />
     <Content Include="Views\Usuario\_ErroresExcel.cshtml" />
     <Content Include="Views\Usuario\_NotificacionDeEstado.cshtml" />
-    <Content Include="Views\UsuarioJS\GetAllJS.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
