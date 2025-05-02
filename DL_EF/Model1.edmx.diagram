@@ -26,6 +26,12 @@
         <AssociationConnector Association="AMoralesProgramacionNCapasUsuariosModel.FKCandidatoCarrera" />
         <AssociationConnector Association="AMoralesProgramacionNCapasUsuariosModel.FKCandidatoUniversidad" />
         <AssociationConnector Association="AMoralesProgramacionNCapasUsuariosModel.FKCandidatoVacante" />
+        <EntityTypeShape EntityType="AMoralesProgramacionNCapasUsuariosModel.Cita" Width="1.5" PointX="11.875" PointY="2" />
+        <EntityTypeShape EntityType="AMoralesProgramacionNCapasUsuariosModel.EstatusCita" Width="1.5" PointX="9.625" PointY="7.375" />
+        <EntityTypeShape EntityType="AMoralesProgramacionNCapasUsuariosModel.Piso" Width="1.5" PointX="9.625" PointY="9.75" />
+        <AssociationConnector Association="AMoralesProgramacionNCapasUsuariosModel.FKCitaCandidato" />
+        <AssociationConnector Association="AMoralesProgramacionNCapasUsuariosModel.FKCitaEstatusCita" />
+        <AssociationConnector Association="AMoralesProgramacionNCapasUsuariosModel.FKCitaPiso" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

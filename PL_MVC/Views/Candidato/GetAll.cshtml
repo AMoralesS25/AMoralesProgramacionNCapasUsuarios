@@ -1,0 +1,143 @@
+﻿@model ML.Candidato
+@{
+    ViewBag.Title = "GetAll";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<link rel="stylesheet" href="~/Styles/StyleGetAllCandidato.css" />
+
+
+<h2><i class="bi bi-person-workspace"></i> Candidatos</h2>
+<hr>
+
+
+@using (Html.BeginForm("GetAll", "Candidato", FormMethod.Post))
+{
+    <div class="container mt-2">
+        <div class="row mt-2">
+            <div class="col">
+                <div class="form-group mt-2">
+                    <p>Selecciona una vacante para mostrar sus candidatos</p>
+                    @Html.DropDownListFor(model => model.Vacante.IdVacante, new SelectList(Model.Vacante.Vacantes, "IdVacante", "Nombre"),
+                        "Selecciona una vacante", new { @class = "form-select", @id = "ddlVacante" })
+                </div>
+            </div>
+        </div>
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-success">Buscar</button>
+        </div>
+    </div>
+}
+
+
+<div class="form-group mt-4">
+    <a href="@Url.Action("Form","Candidato")" class="btn btn-primary">Agregar Candidato</a><br><br>
+</div>
+
+
+@if (Model.Vacante.IdVacante != 0)
+{
+    if (Model.Candidatos.Count > 0)
+    {
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="table-responsive">
+                        <table class="table table-bordered border-dark table table-striped">
+                            <thead class="table-dark table align-middle">
+                                <tr>
+                                    <th scope="col">Editar</th>
+                                    <th scope="col">Eliminar</th>
+                                    <th scope="col">Nombre Completo</th>
+                                    <th scope="col">Edad</th>
+                                    <th scope="col">Correo</th>
+                                    <th scope="col">Telefono</th>
+                                    <th scope="col">Dirección</th>
+                                    <th scope="col">Foto</th>
+                                    <th scope="col">Curriculum</th>
+                                    <th scope="col">Universidad</th>
+                                    <th scope="col">Carrera</th>
+                                    <th scope="col">Bolsa de Trabajo</th>
+                                    <th scope="col">Vacante</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (ML.Candidato candidato in Model.Candidatos)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href="@Url.Action("Form", "Candidato", new {IdCandidato=candidato.IdCandidato})"
+                                               class="btn btn-warning">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="@Url.Action("Delete", "Usuario", new {IdCandidato=candidato.IdCandidato})"
+                                               class="btn btn-danger" onclick="return confirm('¿Estás seguro de eliminar el registro?')">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            @(candidato.Nombre + " " + candidato.ApellidoPaterno + " " + candidato.ApellidoMaterno)
+                                        </td>
+                                        <td>@candidato.Edad</td>
+                                        <td>@candidato.Correo</td>
+                                        <td>@candidato.Telefono</td>
+                                        <td>@candidato.Direccion</td>
+                                        <td>
+                                            @if (candidato.Foto == null)
+                                            {
+                                                <img id="foto" src="https://cdn-icons-png.flaticon.com/512/456/456212.png" width="90" height="90" />
+                                            }
+                                            else
+                                            {
+                                                <img src="data:image/*;base64, @Convert.ToBase64String(candidato.Foto)" width="90" height="90" />
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (candidato.Curriculum == null)
+                                            {
+
+                                                <img id="curriculum" src="                                            https://cdn-icons-png.flaticon.com/512/304/304579.png" width="90" height="90" />
+                                            }
+                                            else
+                                            {
+                                                <a href="@Url.Action("DescargarCurriculum", "Candidato", new {IdCandidato=candidato.IdCandidato})"
+                                                   class="alert alert-primary">
+                                                    <i class="bi bi-file-earmark-arrow-down-fill"></i>
+                                                </a>
+
+
+                                            }
+                                        </td>
+                                        <td>@candidato.Universidad.Nombre</td>
+                                        <td>@candidato.Carrera.Nombre</td>
+                                        <td>@candidato.BolsaTrabajo.Nombre</td>
+                                        <td>@candidato.Vacante.Nombre</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    }
+    else
+    {
+        <div class="alert alert-danger" role="alert" style="width: 50%; margin: 0 auto; text-align: center;">
+            <i class="bi bi-person-fill-exclamation"></i> No existen registros de candidatos de  la vacante
+        </div>
+
+    }
+}
+else
+{
+    <div class="alert alert-light" role="alert" style="width: 50%; margin: 0 auto; text-align: center;">
+        <i class="bi bi-patch-exclamation-fill"></i> Selecciona una vacante
+    </div>
+}
+

@@ -39,6 +39,9 @@ namespace DL_EF
         public virtual DbSet<Carrera> Carreras { get; set; }
         public virtual DbSet<Universidad> Universidads { get; set; }
         public virtual DbSet<Vacante> Vacantes { get; set; }
+        public virtual DbSet<Cita> Citas { get; set; }
+        public virtual DbSet<EstatusCita> EstatusCitas { get; set; }
+        public virtual DbSet<Piso> Pisoes { get; set; }
     
         public virtual int CambioEstatus(Nullable<int> idUsuario, Nullable<bool> estatus)
         {
