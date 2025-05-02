@@ -109,7 +109,7 @@ namespace PL_MVC.Controllers
             result = BL.Usuario.DeleteEF(IdUsuario); ;
 
             JsonResult jsonResult = Json(result, JsonRequestBehavior.AllowGet);
-
+            
             jsonResult.MaxJsonLength = int.MaxValue;
             return jsonResult;
         }
