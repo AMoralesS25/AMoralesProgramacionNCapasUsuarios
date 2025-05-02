@@ -17,6 +17,15 @@
         <AssociationConnector Association="AMoralesProgramacionNCapasUsuariosModel.FKEstadoMunicipio" />
         <AssociationConnector Association="AMoralesProgramacionNCapasUsuariosModel.FKUsuarioRol" />
         <EntityTypeShape EntityType="AMoralesProgramacionNCapasUsuariosModel.UsuarioGetAllView" Width="1.5" PointX="5.375" PointY="5.75" />
+        <EntityTypeShape EntityType="AMoralesProgramacionNCapasUsuariosModel.BolsaTrabajo" Width="1.5" PointX="7.375" PointY="2.5" />
+        <EntityTypeShape EntityType="AMoralesProgramacionNCapasUsuariosModel.Candidato" Width="1.5" PointX="9.625" PointY="1" />
+        <EntityTypeShape EntityType="AMoralesProgramacionNCapasUsuariosModel.Carrera" Width="1.5" PointX="7.375" PointY="17.5" />
+        <EntityTypeShape EntityType="AMoralesProgramacionNCapasUsuariosModel.Universidad" Width="1.5" PointX="7.375" PointY="15.125" />
+        <EntityTypeShape EntityType="AMoralesProgramacionNCapasUsuariosModel.Vacante" Width="1.5" PointX="7.375" PointY="12.25" />
+        <AssociationConnector Association="AMoralesProgramacionNCapasUsuariosModel.FKCandidatoBolsaTrabajo" />
+        <AssociationConnector Association="AMoralesProgramacionNCapasUsuariosModel.FKCandidatoCarrera" />
+        <AssociationConnector Association="AMoralesProgramacionNCapasUsuariosModel.FKCandidatoUniversidad" />
+        <AssociationConnector Association="AMoralesProgramacionNCapasUsuariosModel.FKCandidatoVacante" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
